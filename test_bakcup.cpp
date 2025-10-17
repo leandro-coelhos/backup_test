@@ -62,3 +62,10 @@ TEST_CASE("Backup de arquivo existente deve criar cópia") {
      limpar("teste");
      limpar("backup");
 }
+
+TEST_CASE("Backup de arquivo inexistente deve falhar") {
+     limpar("backup");
+     bool ok = backupArquivo("arquivo_inexistente.txt", "backup/");
+     REQUIRE_FALSE(ok);
+     REQUIRE_FALSE(fs::exists("backup/arquivo_inexistente.txt"));
+}
