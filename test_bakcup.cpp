@@ -25,3 +25,16 @@ TEST_CASE("Ler Backup.parm inexistente retorna lista vazia") {
      auto entradas = lerArquivoBackup("nao_existe.parm");
      REQUIRE(entradas.empty());
 }
+
+TEST_CASE("Ler Backup.parm mal formatado ignora linhas inválidas") {
+     std::ofstream parm("Backup.parm");
+     parm << "# linha válida\n";
+     parm << "./origem.txt ./destino/\n";
+     parm << "so_um_campo_sem_destino\n";
+     parm.close();
+
+     auto entradas = lerArquivoBackup("Backup.parm");
+     REQUIRE(entradas.size() == 1); // só uma linha é válida
+
+     fs::remove("Backup.parm");
+}
