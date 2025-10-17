@@ -6,6 +6,17 @@
 
 namespace fs = std::filesystem;
 
+void criarArquivo(const std::string& caminho, const std::string& conteudo = "teste") {
+     fs::create_directories(fs::path(caminho).parent_path());
+     std::ofstream ofs(caminho);
+     ofs << conteudo;
+     ofs.close();
+}
+
+void limpar(const std::string& caminho) {
+     if (fs::exists(caminho)) fs::remove_all(caminho);
+}
+
 TEST_CASE("Ler Backup.parm válido retorna entradas corretas") {
      std::ofstream parm("Backup.parm");
      parm << "./teste/original.txt ./backup/\n";
@@ -37,4 +48,17 @@ TEST_CASE("Ler Backup.parm mal formatado ignora linhas inválidas") {
      REQUIRE(entradas.size() == 1); // só uma linha é válida
 
      fs::remove("Backup.parm");
+}
+
+TEST_CASE("Backup de arquivo existente deve criar cópia") {
+     limpar("teste");
+     limpar("backup");
+     criarArquivo("teste/original.txt", "conteudo");
+
+     bool ok = backupArquivo("teste/original.txt", "backup/");
+     REQUIRE(ok);
+     REQUIRE(fs::exists("backup/original.txt"));
+
+     limpar("teste");
+     limpar("backup");
 }
