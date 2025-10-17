@@ -69,3 +69,20 @@ TEST_CASE("Backup de arquivo inexistente deve falhar") {
      REQUIRE_FALSE(ok);
      REQUIRE_FALSE(fs::exists("backup/arquivo_inexistente.txt"));
 }
+
+TEST_CASE("Backup em diretório sem permissão deve falhar") {
+     limpar("teste");
+     criarArquivo("teste/original.txt", "conteudo");
+
+     if (fs::exists("somente_leitura")) fs::remove_all("somente_leitura");
+     fs::create_directory("somente_leitura");
+
+     fs::permissions("somente_leitura", fs::perms::owner_read, fs::perm_options::replace);
+
+     bool ok = backupArquivo("teste/original.txt", "somente_leitura/");
+     REQUIRE_FALSE(ok);
+
+     fs::permissions("somente_leitura", fs::perms::owner_all, fs::perm_options::replace);
+     limpar("teste");
+     limpar("somente_leitura");
+}
